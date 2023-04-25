@@ -12,45 +12,45 @@ go get git.sofunny.io/data-analysis/turbine/ingest-client-go-sdk
 ## 基础用法
 
 ```go
-package main
 
 import (
-    "context"
-    "time"
+	"context"
+	"time"
 
-    "git.sofunny.io/data-analysis/ingest-client-go-sdk"
+	client "git.sofunny.io/data-analysis/turbine/ingest-client-go-sdk"
 )
 
 func main() {
-    config := client.Config{
-        Endpoint: "http://localhost:8088",
+	config := client.Config{
+		Endpoint: "http://localhost:8088",
 
-        AccessKeyID: "admin",
-        AccessKeySecret: "adminSecret",
-        ClientID: "sausage-client",
+		AccessKeyID:     "admin",
+		AccessKeySecret: "adminSecret",
+	}
 
-        Encoding: "json",
-        NoCompression: false,
-        CompressionAlgo: "gzip",
+	c, err := client.NewClient(config)
+	if err != nil {
+		return
+	}
 
-        RetryTimeIntervalInitial: 100 * time.Millisecond,
-        RetryTimeIntervalMax: 5 * time.Second,
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
-        Logger: client.DefaultLogger,
-    }
+	messages := &client.Messages{
+		Messages: []client.Message{{
+			Type: "Event",
+			Data: map[string]interface{}{
+				"event": "login",
+				"time":  time.Now().Unix(),
+				"pid":   42,
+				"ip":    "127.0.0.1",
+			},
+		}},
+	}
 
-
-    c, err := client.NewClient(config)
-    if err != nil {
-        return
-    }
-
-    ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-    defer cancel()
-
-    if err := c.Collect(ctx, messages); err != nil {
-        return
-    }
+	if err := c.Collect(ctx, messages); err != nil {
+		panic(err)
+	}
 }
 ```
 
