@@ -1,4 +1,4 @@
-module git.sofunny.io/data-analysis/turbine/ingest-client-go-sdk
+module git.sofunny.io/data-analysis/ingest-client-go-sdk
 
 go 1.18
 

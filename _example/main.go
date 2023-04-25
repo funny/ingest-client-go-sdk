@@ -7,7 +7,7 @@ import (
 	"context"
 	"time"
 
-	client "git.sofunny.io/data-analysis/turbine/ingest-client-go-sdk"
+	client "git.sofunny.io/data-analysis/ingest-client-go-sdk"
 )
 
 func main() {
