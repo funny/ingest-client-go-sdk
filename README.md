@@ -5,8 +5,9 @@ ingest-client-go-sdk
 
 可以通过 go get 的方式来直接获取
 
-```
-go get git.sofunny.io/data-analysis/turbine/ingest-client-go-sdk
+```bash
+env GOPRIVATE=git.sofunny.io \
+	go get git.sofunny.io/data-analysis/ingest-client-go-sdk@latest
 ```
 
 ## 基础用法
