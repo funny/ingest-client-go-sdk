@@ -144,7 +144,7 @@ retry:
 			if timeInterval >= timeIntervalMax {
 				timeInterval = timeIntervalMax
 			}
-			c.conf.Logger.WithField("err", err.Error()).WithField("wait", timeInterval).Warn("failed to send request, retry later")
+			c.conf.Logger.WithField("err", err.Error()).WithField("wait", timeInterval).WithField("batchId", messages.BatchId).Warn("failed to send request, retry later")
 			select {
 			case <-time.After(timeInterval):
 				goto retry

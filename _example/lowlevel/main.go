@@ -20,7 +20,7 @@ func main() {
 
 	c, err := client.NewClient(config)
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

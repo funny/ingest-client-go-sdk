@@ -10,51 +10,63 @@ env GOPRIVATE=git.sofunny.io \
 	go get git.sofunny.io/data-analysis/ingest-client-go-sdk@latest
 ```
 
-## 基础用法
+## 用法
 
+### 基础用法
 ```go
 package main
 
 import (
 	"context"
+	"os"
 	"time"
 
 	client "git.sofunny.io/data-analysis/ingest-client-go-sdk"
 )
 
 func main() {
-	config := client.Config{
-		Endpoint: "http://localhost:8088",
+	config := client.BufferedClientConfig{
+		Endpoint: "https://ingest.zh-cn.xmfunny.com",
 
-		AccessKeyID:     "admin",
-		AccessKeySecret: "adminSecret",
+		AccessKeyID:     "demo",
+		AccessKeySecret: "secret",
+
+		// turn on debug log to see what happend underneath
+		Logger: client.NewLogger(os.Stderr, client.LevelDebug),
 	}
 
-	c, err := client.NewClient(config)
+	c, err := client.NewBufferedClient(config)
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	messages := &client.Messages{
-		Messages: []client.Message{{
+	defer c.Close(ctx)
+
+	for i := 0; i < 2500; i++ {
+		msg := &client.Message{
 			Type: "Event",
 			Data: map[string]interface{}{
-				"event": "login",
-				"time":  time.Now().Unix(),
-				"pid":   42,
-				"ip":    "127.0.0.1",
+				"#event": "login",
+				"#time":  time.Now().UnixMilli(),
+				"pid":    42,
+				"ip":     "127.0.0.1",
 			},
-		}},
+		}
+
+		if err := c.Send(ctx, msg); err != nil {
+			panic(err)
+		}
 	}
 
-	if err := c.Collect(ctx, messages); err != nil {
-		panic(err)
-	}
+	// wait a little bit for data to send
+	time.Sleep(200 * time.Millisecond)
 }
 ```
+
+多用法请参考 [_example](_example) 文件夹
 
 ## 特性
 - 支持序列化，目前支持 JSON 和 msgpack
@@ -65,3 +77,4 @@ func main() {
 - 重试的总时间会根据传入 Collect 中的 context 的生命周期来控制
 - Logger 日志模块
 - 支持自动生成 batchID 功能
+- 自动并发分批发送
