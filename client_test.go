@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 )
@@ -42,7 +43,14 @@ func sendMessage(t *testing.T, conf Config, num int) {
 	defer cancel()
 
 	if err := c.Collect(ctx, messages); err != nil {
-		t.Fatal(err)
+		var innerErr Error
+		asResult := errors.As(err, &innerErr)
+		if asResult {
+			t.Fatal(innerErr.StatusCode, innerErr.Message)
+		} else {
+			t.Fatal(err)
+		}
+
 	}
 }
 
