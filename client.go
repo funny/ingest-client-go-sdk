@@ -225,7 +225,6 @@ func (c *Client) doRequestWithContext(req *http.Request, method, api string, dat
 		err := json.Unmarshal(responseBody, &rerr)
 		if err != nil {
 			log.WithField("err", err.Error()).WithField("content", string(responseBody)).Warn("unrecognizable response")
-			rerr.StatusCode = resp.StatusCode
 			rerr.Message = string(responseBody)
 		}
 		rerr.StatusCode = resp.StatusCode
