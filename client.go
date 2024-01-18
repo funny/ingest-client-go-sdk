@@ -115,6 +115,13 @@ func (c *Client) Collect(ctx context.Context, messages *Messages) error {
 		return err
 	}
 
+	if !c.conf.NoCompression {
+		data, err = c.compress(data)
+		if err != nil {
+			return err
+		}
+	}
+
 retry:
 	req, err := http.NewRequest(method, c.conf.Endpoint+api, bytes.NewBuffer(data))
 	if err != nil {
@@ -130,10 +137,6 @@ retry:
 	req.Header.Set("X-Ingest-Client-ID", c.conf.ClientId)
 
 	if !c.conf.NoCompression {
-		data, err = c.compress(data)
-		if err != nil {
-			return err
-		}
 		req.Header.Set("Content-Encoding", "gzip")
 	}
 
