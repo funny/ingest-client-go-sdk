@@ -108,22 +108,24 @@ func (c *Client) Collect(ctx context.Context, messages *Messages) error {
 	api := "/v1/collect"
 	timeInterval := c.conf.RetryTimeIntervalInitial
 	timeIntervalMax := c.conf.RetryTimeIntervalMax
-	req, err := http.NewRequest(method, c.conf.Endpoint+api, nil)
-	if err != nil {
-		return err
-	}
-
-	// Workaround 每隔20个请求清理一次连接，这样能够让每一个 ingest server 收到的请求相对均匀一点
-	if atomic.AddInt64(&c.reqCount, 1)%20 == 0 {
-		req.Close = true
-		c.httpClient.CloseIdleConnections()
-	}
 
 	// 序列化 && 压缩数据
 	data, err := encoding(c.conf.Encoding, &messages)
 	if err != nil {
 		return err
 	}
+
+retry:
+	req, err := http.NewRequest(method, c.conf.Endpoint+api, bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+	// Workaround 每隔20个请求清理一次连接，这样能够让每一个 ingest server 收到的请求相对均匀一点
+	if atomic.AddInt64(&c.reqCount, 1)%20 == 0 {
+		req.Close = true
+		c.httpClient.CloseIdleConnections()
+	}
+
 	req.Header.Set("Content-Type", path.Join("application", c.conf.Encoding))
 	req.Header.Set("X-Ingest-Client-ID", c.conf.ClientId)
 
@@ -135,9 +137,7 @@ func (c *Client) Collect(ctx context.Context, messages *Messages) error {
 		req.Header.Set("Content-Encoding", "gzip")
 	}
 
-retry:
 	req = req.WithContext(ctx)
-	req.Body = ioutil.NopCloser(bytes.NewBuffer(data))
 	if err := c.doRequestWithContext(req, method, api, data); err != nil {
 		if isCaredError(err) {
 			timeInterval = timeInterval * 2
