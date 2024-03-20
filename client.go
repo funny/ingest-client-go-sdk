@@ -264,7 +264,7 @@ func isCaredError(err error) bool {
 			innerErr.StatusCode == http.StatusRequestTimeout {
 			return true
 		}
-		if innerErr.StatusCode >= http.StatusInternalServerError {
+		if innerErr.StatusCode >= 500 && innerErr.StatusCode <= 599 {
 			return true
 		}
 		return false
