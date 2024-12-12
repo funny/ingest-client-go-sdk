@@ -6,7 +6,7 @@ ingest-client-go-sdk
 可以通过 go get 的方式来直接获取
 
 ```bash
-go get github.com/funny/ingest-client-go-sdk@latest
+go get github.com/funny/ingest-client-go-sdk/v2@latest
 ```
 
 ## 用法
@@ -20,7 +20,7 @@ import (
 	"os"
 	"time"
 
-	client "github.com/funny/ingest-client-go-sdk"
+	client "github.com/funny/ingest-client-go-sdk/v2"
 )
 
 func main() {

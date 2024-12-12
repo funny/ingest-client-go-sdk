@@ -18,7 +18,7 @@ import (
 
 	"log/slog"
 
-	client "github.com/funny/ingest-client-go-sdk"
+	client "github.com/funny/ingest-client-go-sdk/v2"
 	"golang.org/x/sync/errgroup"
 )
 

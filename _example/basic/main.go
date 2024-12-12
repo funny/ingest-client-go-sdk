@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	client "github.com/funny/ingest-client-go-sdk"
+	client "github.com/funny/ingest-client-go-sdk/v2"
 )
 
 func main() {

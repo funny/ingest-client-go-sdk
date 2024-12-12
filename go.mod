@@ -1,4 +1,4 @@
-module github.com/funny/ingest-client-go-sdk
+module github.com/funny/ingest-client-go-sdk/v2
 
 go 1.18
 
