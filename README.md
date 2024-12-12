@@ -6,8 +6,7 @@ ingest-client-go-sdk
 可以通过 go get 的方式来直接获取
 
 ```bash
-env GOPRIVATE=git.sofunny.io \
-	go get git.sofunny.io/data-analysis/ingest-client-go-sdk@latest
+go get github.com/funny/ingest-client-go-sdk@latest
 ```
 
 ## 用法
@@ -21,7 +20,7 @@ import (
 	"os"
 	"time"
 
-	client "git.sofunny.io/data-analysis/ingest-client-go-sdk"
+	client "github.com/funny/ingest-client-go-sdk"
 )
 
 func main() {
