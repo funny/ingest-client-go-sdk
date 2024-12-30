@@ -200,12 +200,14 @@ func (c *Client) doRequestWithContext(req *http.Request, method, api string, dat
 	nonce := strconv.Itoa(rand.Int())
 	log := c.conf.Logger.WithField("method", method).WithField("api", api)
 
-	req.Header.Set("X-AccessKeyId", c.conf.AccessKeyID)
-	req.Header.Set("X-Timestamp", timestamp)
-	req.Header.Set("X-Nonce", nonce)
+	if c.conf.AccessKeyID != "" {
+		req.Header.Set("X-AccessKeyId", c.conf.AccessKeyID)
+		req.Header.Set("X-Timestamp", timestamp)
+		req.Header.Set("X-Nonce", nonce)
 
-	signature := calculateSignature(method, api, c.conf.AccessKeyID, timestamp, nonce, c.conf.AccessKeySecret, data)
-	req.Header.Set("X-Signature", base64.StdEncoding.EncodeToString(signature))
+		signature := calculateSignature(method, api, c.conf.AccessKeyID, timestamp, nonce, c.conf.AccessKeySecret, data)
+		req.Header.Set("X-Signature", base64.StdEncoding.EncodeToString(signature))
+	}
 
 	req.Header.Set("User-Agent", "turbine-ingest-client/unknown")
 	resp, err := c.httpClient.Do(req)
