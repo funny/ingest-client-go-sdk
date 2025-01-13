@@ -65,6 +65,22 @@ func main() {
 }
 ```
 
+### 手动导入数据
+
+该项目包含一个命令行工具，方便手动上传数据
+
+安装方式：`go install github.com/funny/ingest-client-go-sdk/v2/cmd/ingest-import@latest`
+
+使用方式
+
+```sh
+echo '{"type": "Event", "data": {"#event": "login", "#time": 1728904200000}}' | \
+	ingest-console \
+		-endpoint https://ingest.zh-cn.xmfunny.com \
+		-access-key-id xxx \
+		-access-key-secret yyy
+```
+
 多用法请参考 [_example](_example) 文件夹
 
 ## 特性
