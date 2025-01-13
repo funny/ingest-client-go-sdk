@@ -75,7 +75,7 @@ func main() {
 
 ```sh
 echo '{"type": "Event", "data": {"#event": "login", "#time": 1728904200000}}' | \
-	ingest-console \
+	ingest-import \
 		-endpoint https://ingest.zh-cn.xmfunny.com \
 		-access-key-id xxx \
 		-access-key-secret yyy
