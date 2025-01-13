@@ -87,14 +87,17 @@ func ingestImport(
 				msgsCopy := msgs
 				msgs = client.Messages{}
 				eg.Go(func() error {
-					defer atomic.AddUint64(&sent, uint64(len(msgs.Messages)))
+					defer atomic.AddUint64(&sent, uint64(len(msgsCopy.Messages)))
 					return c.Collect(ctx, &msgsCopy)
 				})
 			}
 		}
 		if len(msgs.Messages) > 0 {
-			defer atomic.AddUint64(&sent, uint64(len(msgs.Messages)))
-			return c.Collect(ctx, &msgs)
+			err := c.Collect(ctx, &msgs)
+			if err != nil {
+				return err
+			}
+			atomic.AddUint64(&sent, uint64(len(msgs.Messages)))
 		}
 		return nil
 	})
@@ -102,6 +105,6 @@ func ingestImport(
 	if err := eg.Wait(); err != nil {
 		return err
 	}
-	slog.Info("message sent", "count", sent)
+	slog.Info("message sent", "count", atomic.LoadUint64(&sent))
 	return nil
 }
