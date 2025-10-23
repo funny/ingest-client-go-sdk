@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"net"
 	"net/http"
 	"path"
 	"strconv"
@@ -271,6 +272,11 @@ func isCaredError(err error) bool {
 		}
 		return false
 	case errors.Is(err, syscall.ETIMEDOUT) || errors.Is(err, syscall.ECONNREFUSED):
+		return true
+	}
+	// check is
+	dnsErr := &net.DNSError{}
+	if errors.As(err, &dnsErr) && dnsErr.IsNotFound { // no route to host
 		return true
 	}
 	return false
