@@ -143,7 +143,7 @@ retry:
 
 	req = req.WithContext(ctx)
 	if err := c.doRequestWithContext(req, method, api, data); err != nil {
-		if isCaredError(err) {
+		if shouldRetry(err) {
 			timeInterval = timeInterval * 2
 			if timeInterval >= timeIntervalMax {
 				timeInterval = timeIntervalMax
@@ -259,7 +259,7 @@ func (err Error) Error() string {
 	return fmt.Sprintf("http code: %v: %v", err.StatusCode, err.Message)
 }
 
-func isCaredError(err error) bool {
+func shouldRetry(err error) bool {
 	var innerErr Error
 	switch {
 	case errors.As(err, &innerErr):
@@ -276,8 +276,12 @@ func isCaredError(err error) bool {
 	}
 	// check is
 	dnsErr := &net.DNSError{}
-	if errors.As(err, &dnsErr) && dnsErr.IsNotFound { // no route to host
-		return true
+	if errors.As(err, &dnsErr) {
+		if dnsErr.IsNotFound { // no route to host
+			return true
+		} else if dnsErr.IsTemporary { // dns lookup i/o timeout
+			return true
+		}
 	}
 	return false
 }
