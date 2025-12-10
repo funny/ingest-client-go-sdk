@@ -58,6 +58,9 @@ func ingestImport(
 	}
 
 	dec := json.NewDecoder(bufio.NewReader(os.Stdin))
+
+	dec.UseNumber() // 启用 UseNumber 方法以防止精度丢失
+
 	sent := uint64(0)
 
 	eg, ctx := errgroup.WithContext(context.Background())
